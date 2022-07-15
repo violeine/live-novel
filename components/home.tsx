@@ -6,7 +6,10 @@ import { Tab } from "@headlessui/react";
 
 export function HomePage() {
   const [location, setLocation] = useState<any>(null);
-  const [selections, setSelections] = useState<any[]>([]);
+  const [selections, setSelections] = useState<any[]>(() => {
+    return [];
+  });
+
   const [img, setImg] = useState<any>(null);
   const [settings, setSettings] = useState({
     url: "http://nhtlongcs.com:5000",
@@ -19,6 +22,10 @@ export function HomePage() {
   };
 
   const renditionRef = useRef<any>(null);
+
+  const saveHighlight = () => {
+    localStorage.setItem("highlights", JSON.stringify(selections));
+  };
 
   useQueryClient();
 
@@ -48,7 +55,6 @@ export function HomePage() {
       const rendition = renditionRef.current;
       const setRenderSelection = (cfiRange: any, contents: any) => {
         const text = renditionRef.current.getRange(cfiRange).toString();
-        console.log(text);
         setSelections((p) =>
           p.concat({
             text,
@@ -80,7 +86,25 @@ export function HomePage() {
           url="https://react-reader.metabits.no/files/alice.epub"
           getRendition={(rendition) => {
             renditionRef.current = rendition;
-            setSelections([]);
+            const highlightFromLocalStorage =
+              typeof window !== "undefined"
+                ? window.localStorage.getItem("highlights")
+                : null;
+            const parsedHighlight = JSON.parse(
+              highlightFromLocalStorage ?? JSON.parse(JSON.stringify([]))
+            );
+            setSelections(() => {
+              return parsedHighlight;
+            });
+            parsedHighlight.map((el: any) => {
+              rendition.annotations.add(
+                "highlight",
+                el.cfiRange,
+                {},
+                () => {},
+                "hl"
+              );
+            });
           }}
         />
       </div>
@@ -184,6 +208,14 @@ export function HomePage() {
                       setSettings((p) => ({ ...p, style: e.target.value }));
                     }}
                   />
+                </div>
+                <div>
+                  <button
+                    className="px-3 py-2 bg-blue-400 text-blue-900 rounded"
+                    onClick={saveHighlight}
+                  >
+                    Save your highlight
+                  </button>
                 </div>
               </Tab.Panel>
             </Tab.Panels>
