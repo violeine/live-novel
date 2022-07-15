@@ -3,12 +3,35 @@ import { useMutation, useQueryClient } from "react-query";
 import { ReactReader } from "react-reader";
 import { Ring } from "@uiball/loaders";
 import { Tab } from "@headlessui/react";
-
+const alice_highlight = [
+  {
+    text: "a little table, all made of solid glass. There was nothing on\n\t\tit but a tiny golden key",
+    cfiRange: "epubcfi(/6/8!/4/2/26,/1:23,/1:111)",
+  },
+  {
+    text: "beds of bright flowers and those cool fountains,",
+    cfiRange: "epubcfi(/6/8!/4/2/28,/1:262,/1:310)",
+  },
+  {
+    text: "The Pool Of Tears\n\t\t\n\t\t",
+    cfiRange: "epubcfi(/6/10!/4/2,/2[pgepubid00005]/1:0,/4/1:0)",
+  },
+  {
+    text: "a tidy little room with a table in the\n\t\t\twindow, and on it a fan and two or three pairs of tiny white kid-gloves",
+    cfiRange: "epubcfi(/6/14!/4/2/10,/1:43,/1:156)",
+  },
+  {
+    text: "The Duchess \ttucked her arm affectionately into Alice's",
+    cfiRange: "epubcfi(/6/14!/4/2/50/4/2,/1:1,/1:56)",
+  },
+  {
+    text: "Alice at the Mad Tea Party.\n\t\t\t\n\t\t\n\t\t\n\t\t",
+    cfiRange: "epubcfi(/6/10!/4/2,/40/4/2/1:0,/42/1:0)",
+  },
+];
 export function HomePage() {
   const [location, setLocation] = useState<any>(null);
-  const [selections, setSelections] = useState<any[]>(() => {
-    return [];
-  });
+  const [selections, setSelections] = useState<any[]>([]);
 
   const [img, setImg] = useState<any>(null);
   const [settings, setSettings] = useState({
@@ -25,6 +48,11 @@ export function HomePage() {
 
   const saveHighlight = () => {
     localStorage.setItem("highlights", JSON.stringify(selections));
+  };
+
+  const removeHighlight = (cfiRange: any) => {
+    setSelections((p) => p.filter((el) => el.cfiRange !== cfiRange));
+    renditionRef.current.annotations.remove(cfiRange, "highlight");
   };
 
   useQueryClient();
@@ -91,7 +119,7 @@ export function HomePage() {
                 ? window.localStorage.getItem("highlights")
                 : null;
             const parsedHighlight = JSON.parse(
-              highlightFromLocalStorage ?? JSON.parse(JSON.stringify([]))
+              highlightFromLocalStorage ?? JSON.stringify([])
             );
             setSelections(() => {
               return parsedHighlight;
@@ -112,15 +140,24 @@ export function HomePage() {
         <div className="space-y-3 overflow-y-scroll h-1/2 py-3 px-4 rounded border border-slate-200 bg-slate-50">
           {selections.map(({ text, cfiRange }, i) => {
             return (
-              <p
+              <div
                 key={i}
                 className="bg-white p-3 rounded shadow text-slate-800 cursor-pointer border-slate-200"
+              >
+                <p
                 onClick={() => {
                   renditionRef.current.display(cfiRange);
                 }}
               >
                 {text}
               </p>
+                <button
+                  className="bg-gray-100 rounded px-2 py-1 shadow-sm"
+                  onClick={() => removeHighlight(cfiRange)}
+                >
+                  remove
+                </button>
+              </div>
             );
           })}
         </div>
@@ -132,7 +169,7 @@ export function HomePage() {
                   ` px-2 hover:bg-slate-200 w-24 font-semibold
                   ${
                     selected
-                      ? "border-b border-b-slate-700 hover:rounded-t text-slate-700"
+                      ? "border-b-2 border-b-slate-700 hover:rounded-t text-slate-700"
                       : "hover:rounded hover:text-slate-700 text-slate-500"
                   }`
                 }
@@ -144,7 +181,7 @@ export function HomePage() {
                   ` px-2 hover:bg-slate-200 w-24 font-semibold
                   ${
                     selected
-                      ? "border-b border-b-slate-700 hover:rounded-t text-slate-700"
+                      ? "border-b-2 border-b-slate-700 hover:rounded-t text-slate-700"
                       : "hover:rounded hover:text-slate-700 text-slate-500"
                   }`
                 }
