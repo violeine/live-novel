@@ -35,8 +35,7 @@ export function HomePage() {
 
   const [img, setImg] = useState<any>(null);
   const [settings, setSettings] = useState({
-    url: "http://nhtlongcs.com:5000",
-    style: "watercolor",
+    url: "http://selab.nhtlongcs.com:20558",
     seed: 1234,
   });
   const locationChanged = (epubcifi: any) => {
@@ -57,22 +56,26 @@ export function HomePage() {
 
   useQueryClient();
 
-  const createImage = useMutation(
-    async (prompt: string) => {
-      const result = await fetch(settings.url, {
+  const createImage = useMutation(async (prompt: string) => {
+    const result = await fetch(
+      `${settings.url}/create?prompt=ilustration of ${prompt} in alice in the wonderland&sess_name=${prompt}1&seed=${settings.seed}`,
+      {
         method: "POST",
-        body: JSON.stringify({
-          text: prompt.replace(/^\s*|\s(?=\s)|\s*$/g, "").replace(/[\t]/g, " "),
-          style: settings.style,
-          seed: settings.seed,
-        }),
+      }
+    );
+    return result;
+  });
+  const getResult = useMutation(
+    async (prompt) => {
+      const result = await fetch(`${settings.url}/result?sess_name=${prompt}`, {
+        method: "POST",
       })
-        .then((res) => res.blob())
-        .then((b) => URL.createObjectURL(b));
+        .then((res) => res.json())
+        .then((b) => b.image);
       return result;
     },
     {
-      onSuccess: (res) => {
+      onSuccess: async (res) => {
         setImg(res);
       },
     }
@@ -145,12 +148,15 @@ export function HomePage() {
                 className="bg-white p-3 rounded shadow text-slate-800 cursor-pointer border-slate-200"
               >
                 <p
-                onClick={() => {
-                  renditionRef.current.display(cfiRange);
-                }}
-              >
-                {text}
-              </p>
+                  onClick={() => {
+                    renditionRef.current.display(cfiRange);
+                  }}
+                >
+                  {text}
+                </p>
+                <button onClick={() => getResult.mutate(text)}>
+                  get result
+                </button>
                 <button
                   className="bg-gray-100 rounded px-2 py-1 shadow-sm"
                   onClick={() => removeHighlight(cfiRange)}
@@ -191,12 +197,12 @@ export function HomePage() {
             </Tab.List>
             <Tab.Panels>
               <Tab.Panel className="flex items-center justify-center h-96 rounded-lg shadow">
-                {createImage.isLoading ? (
+                {getResult.isLoading ? (
                   <Ring size={40} lineWeight={5} speed={2} color="black" />
                 ) : (
                   <img
                     className="object-cover w-full h-96 rounded-lg"
-                    src="https://images.unsplash.com/photo-1657311277092-fe3655cf2e8c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2970&q=80"
+                    src={`data:image/png;base64,${btoa(img)}`}
                   />
                 )}
               </Tab.Panel>
