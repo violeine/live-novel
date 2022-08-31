@@ -238,20 +238,6 @@ export function HomePage() {
                     }}
                   />
                 </div>
-                <div className="flex items-center w-full">
-                  <label htmlFor="url" className="w-1/6 font-semibold">
-                    Style
-                  </label>
-                  <input
-                    type="text"
-                    className="form-input rounded bg-slate-50 border-none w-1/2 shadow-sm"
-                    name="url"
-                    value={settings.style}
-                    onChange={(e) => {
-                      setSettings((p) => ({ ...p, style: e.target.value }));
-                    }}
-                  />
-                </div>
                 <div>
                   <button
                     className="px-3 py-2 bg-blue-400 text-blue-900 rounded"
