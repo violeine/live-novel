@@ -33,7 +33,7 @@ export function HomePage() {
     function setRenderSelection(cfiRange: any, content: any) {
       setOption((p) => ({
         ...p,
-        prompt: reader.getRange(cfiRange).toString(),
+        prompt: reader.getRange(cfiRange).toString().replace(/\s+/g, " "),
       }));
       content.window.getSelection().removeAllRanges();
     }
@@ -95,7 +95,7 @@ export function HomePage() {
                   rows={4}
                   name="prompt"
                   id="prompt"
-                  value={option.prompt.replace(/\s/g, " ")}
+                  value={option.prompt}
                   onChange={(e) =>
                     setOption((p) => ({ ...p, prompt: e.target.value }))
                   }
