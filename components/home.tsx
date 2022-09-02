@@ -12,11 +12,6 @@ export interface Options {
   url: string;
 }
 export function HomePage() {
-  const [location, setLocation] = useState<any>(null);
-  const locationChanged = (epubcifi: any) => {
-    // epubcifi is a internal string used by epubjs to point to a location in an epub. It looks like this: epubcfi(/6/6[titlepage]!/4/2/12[pgepubid00003]/3:0)
-    setLocation(epubcifi);
-  };
   const [option, setOption] = useState({
     prefix: "",
     postfix: "",
@@ -48,7 +43,6 @@ export function HomePage() {
         <ReactReader
           showToc={false}
           url="https://react-reader.metabits.no/files/alice.epub"
-          locationChanged={locationChanged}
           getRendition={(reader) => readerRef(reader)}
         />
       </div>
@@ -121,7 +115,7 @@ export function HomePage() {
                   className="p-2 rounded border focus:border-slate-500 focus:outline-none flex-1"
                 />
               </div>
-              <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
                 <div className="flex items-center gap-2">
                   <label
                     htmlFor="seed"
@@ -138,6 +132,21 @@ export function HomePage() {
                     }
                     type="text"
                     className="p-2 rounded border focus:border-slate-500 focus:outline-none"
+                  />
+                </div>
+                <div className="flex items-center gap-2 flex-1">
+                  <label htmlFor="url" className="font-medium text-slate-700">
+                    Url
+                  </label>
+                  <input
+                    id="url"
+                    name="url"
+                    value={option.url}
+                    onChange={(e) =>
+                      setOption((p) => ({ ...p, url: e.target.value }))
+                    }
+                    type="text"
+                    className="p-2 rounded border focus:border-slate-500 focus:outline-none flex-1"
                   />
                 </div>
                 <button
