@@ -1,13 +1,11 @@
+import { Options } from "../components/home";
 import { promptToSHA1 } from "./hash";
 
-export interface Options {
-  url: string;
-  prompt: string;
-  seed: string;
-}
 export const fetchPrompt = async (o: Options): Promise<string> => {
-  const session = await promptToSHA1(o.prompt + o.seed);
-  const URL = `${o.url}/create?sess_name=${session}&prompt=${o.prompt}&seed=${o.seed}&ratio=4x6`;
+  const prompt = `${o.prefix} ${o.prompt} ${o.postfix}`;
+  const session = await promptToSHA1(prompt + o.seed);
+
+  const URL = `${o.url}/create?sess_name=${session}&prompt=${prompt}&seed=${o.seed}&ratio=4x6`;
   const create = await fetch(URL, {
     method: "POST",
   });
